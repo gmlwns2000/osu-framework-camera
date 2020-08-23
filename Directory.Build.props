@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup Label="C#">
+      <LangVersion>8.0</LangVersion>
+      <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Label="NuGet">
+    <Authors>Nitrous</Authors>
+    <Copyright>Copyright (c) 2020 Nitrous</Copyright>
+    <Product>osu!framework Camera Extension</Product>
+    <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/holotrack/osu-framework-camera</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/holotrack/osu-framework-camera</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup Label="Sourcelink3">
+    <EnableSourceLink Condition=" '$(OS)' != 'Windows_NT' AND '$(MSBuildRuntimeType)' != 'Core' ">false</EnableSourceLink>
+    <EnableSourceControlManagerQueries>$(EnableSourceLink)</EnableSourceControlManagerQueries>
+  </PropertyGroup>
+</Project>

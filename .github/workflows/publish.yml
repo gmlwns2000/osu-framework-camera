@@ -1,0 +1,29 @@
+name: publish to nuget
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    name: publish
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup
+        uses: actions/setup-dotnet@v1
+        with:
+          source-url: https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      
+      - name: Build and Publish
+        run: ./deploy.ps1
+        shell: powershell
+        env:
+          NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}

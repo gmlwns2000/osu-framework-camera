@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\osu.Framework.Camera\osu.Framework.Camera.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.4.0.20200725"/>
+  </ItemGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+</Project>
