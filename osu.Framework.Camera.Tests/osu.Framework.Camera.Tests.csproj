@@ -7,6 +7,6 @@
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 </Project>
