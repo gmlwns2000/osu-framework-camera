@@ -13,7 +13,7 @@ namespace osu.Framework.Graphics.Camera
     public class CameraSprite : Sprite
     {
         private Task cameraLoopTask;
-        private CancellationTokenSource cameraLoopTaskCanellationTokenSource;
+        private CancellationTokenSource cameraLoopCanellationSource;
         private VideoCapture capture;
         private readonly Mat image;
 
@@ -23,8 +23,6 @@ namespace osu.Framework.Graphics.Camera
             get => cameraID;
             set
             {
-                if (cameraID == value) return;
-
                 if (IsLoaded)
                     stopRecording();
 
@@ -68,19 +66,19 @@ namespace osu.Framework.Graphics.Camera
 
         private void startRecording()
         {
-            cameraLoopTaskCanellationTokenSource = new CancellationTokenSource();
-            cameraLoopTask = Task.Factory.StartNew(() => cameraLoop(cameraLoopTaskCanellationTokenSource.Token), cameraLoopTaskCanellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            cameraLoopCanellationSource = new CancellationTokenSource();
+            cameraLoopTask = Task.Factory.StartNew(() => cameraLoop(cameraLoopCanellationSource.Token), cameraLoopCanellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void stopRecording()
         {
-            cameraLoopTaskCanellationTokenSource.Cancel();
+            cameraLoopCanellationSource.Cancel();
             cameraLoopTask.Wait();
             cameraLoopTask.Dispose();
-            cameraLoopTaskCanellationTokenSource.Dispose();
+            cameraLoopCanellationSource.Dispose();
 
             cameraLoopTask = null;
-            cameraLoopTaskCanellationTokenSource = null;
+            cameraLoopCanellationSource = null;
         }
 
         protected override void Dispose(bool isDisposing)
