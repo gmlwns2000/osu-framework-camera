@@ -1,6 +1,7 @@
 // Copyright (c) Nitrous <n20gaming2000@gmail.com>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenCvSharp;
@@ -37,6 +38,8 @@ namespace osu.Framework.Graphics.Camera
             }
         }
 
+        public byte[] TextureData { get; private set; }
+
         public CameraSprite(int cameraID = 0)
         {
             CameraID = cameraID;
@@ -62,7 +65,10 @@ namespace osu.Framework.Graphics.Camera
                 capture?.Read(image);
 
                 if (!(image?.Empty() ?? true))
-                    Texture =  Texture.FromStream(image.ToMemoryStream());
+                {
+                    TextureData = image.ToBytes();
+                    Texture = Texture.FromStream(new MemoryStream(TextureData));
+                }
             }
         }
 
@@ -79,6 +85,7 @@ namespace osu.Framework.Graphics.Camera
             cameraLoopTask.Dispose();
             cameraLoopTaskCanellationTokenSource.Dispose();
 
+            TextureData = null;
             cameraLoopTask = null;
             cameraLoopTaskCanellationTokenSource = null;
         }
