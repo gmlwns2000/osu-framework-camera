@@ -19,9 +19,13 @@ namespace osu.Framework.Camera.Tests.Visual
         private BasicDropdown<string> deviceList;
         private Bindable<string> device = new Bindable<string>();
 
-        [BackgroundDependencyLoader]
-        private void load(CameraManager camera)
+        [Resolved]
+        private CameraManager camera { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             AddRange(new Drawable[]
             {
                 deviceList = new BasicDropdown<string>
@@ -38,8 +42,16 @@ namespace osu.Framework.Camera.Tests.Visual
                 }
             });
 
+            camera.OnNewDevice += updateDevices;
+            camera.OnLostDevice += updateDevices;
+
             device.BindTo(deviceList.Current);
             device.ValueChanged += (v) => display.CameraID = camera.CameraDeviceNames.ToList().IndexOf(v.NewValue);
+        }
+
+        private void updateDevices(string name)
+        {
+            deviceList.Items = camera.CameraDeviceNames;
         }
     }
 }
