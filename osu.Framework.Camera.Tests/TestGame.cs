@@ -15,7 +15,7 @@ namespace osu.Framework.Camera.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.Cache(new CameraManager());
+            dependencies.Cache(new CameraManager(Host.UpdateThread) { EventScheduler = Scheduler });
         }
     }
 }

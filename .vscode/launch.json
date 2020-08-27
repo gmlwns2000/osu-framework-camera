@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/osu.Framework.Camera.Tests/bin/Debug/net5.0/osu.Framework.Camera.Tests.dll",
+            "program": "${workspaceFolder}/osu.Framework.Camera.Tests/bin/Debug/netcoreapp3.1/osu.Framework.Camera.Tests.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
