@@ -4,6 +4,8 @@
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Camera;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osuTK;
 using osu.Framework.Input;
@@ -28,18 +30,40 @@ namespace osu.Framework.Camera.Tests.Visual
 
             AddRange(new Drawable[]
             {
+                new Box
+                {
+                    Size = new Vector2(684),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = Colour4.Red,
+                },
+                new Container
+                {
+                    Size = new Vector2(512),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.Blue,
+                        },
+                        display = new CameraSprite
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
+                },
                 deviceList = new BasicDropdown<string>
                 {
                     Width = 300,
                     Margin = new MarginPadding(10),
                     Items = camera.CameraDeviceNames
                 },
-                display = new CameraSprite
-                {
-                    Size = new Vector2(512),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             });
 
             camera.OnNewDevice += updateDevices;

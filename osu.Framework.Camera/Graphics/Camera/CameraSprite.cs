@@ -36,7 +36,14 @@ namespace osu.Framework.Graphics.Camera
             }
         }
 
-        public byte[] TextureData { get; private set; }
+        /// <summary>
+        /// The camera's image data as a byte array.
+        /// </summary>
+        public byte[] CaptureData { get; private set; }
+
+        public VideoCapture Capture => capture;
+        public float FrameWidth => (float)(capture?.FrameWidth);
+        public float FrameHeight => (float)(capture?.FrameHeight);
 
         public CameraSprite(int cameraID = 0)
         {
@@ -55,19 +62,36 @@ namespace osu.Framework.Graphics.Camera
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
+                    clearTexture();
                     return;
+                }
 
                 if (CameraID == -1)
+                {
+                    clearTexture();
                     continue;
+                }
 
                 capture?.Read(image);
 
-                if (!(image?.Empty() ?? true))
+                if (image?.Empty() ?? true)
                 {
-                    TextureData = image.ToBytes();
-                    Texture = Texture.FromStream(new MemoryStream(TextureData));
+                    clearTexture();
+                    continue;
                 }
+                
+                CaptureData = image.ToBytes();
+                Texture = Texture.FromStream(new MemoryStream(CaptureData));
+                Colour = Colour4.White;
             }
+        }
+
+        private void clearTexture()
+        {
+            CaptureData = null;
+            Texture = Texture.WhitePixel;
+            Colour = Colour4.Black;
         }
 
         private void startRecording()
@@ -83,7 +107,6 @@ namespace osu.Framework.Graphics.Camera
             cameraLoopTask.Dispose();
             cameraLoopCanellationSource.Dispose();
 
-            TextureData = null;
             cameraLoopTask = null;
             cameraLoopCanellationSource = null;
         }
