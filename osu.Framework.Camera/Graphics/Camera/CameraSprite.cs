@@ -1,6 +1,7 @@
 // Copyright (c) Nitrous <n20gaming2000@gmail.com>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenCvSharp;
@@ -35,6 +36,15 @@ namespace osu.Framework.Graphics.Camera
             }
         }
 
+        /// <summary>
+        /// The camera's image data as a byte array.
+        /// </summary>
+        public byte[] CaptureData { get; private set; }
+
+        public VideoCapture Capture => capture;
+        public float FrameWidth => (float)(capture?.FrameWidth);
+        public float FrameHeight => (float)(capture?.FrameHeight);
+
         public CameraSprite(int cameraID = 0)
         {
             CameraID = cameraID;
@@ -52,16 +62,36 @@ namespace osu.Framework.Graphics.Camera
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
+                    clearTexture();
                     return;
+                }
 
                 if (CameraID == -1)
+                {
+                    clearTexture();
                     continue;
+                }
 
                 capture?.Read(image);
 
-                if (!(image?.Empty() ?? true))
-                    Texture =  Texture.FromStream(image.ToMemoryStream());
+                if (image?.Empty() ?? true)
+                {
+                    clearTexture();
+                    continue;
+                }
+                
+                CaptureData = image.ToBytes();
+                Texture = Texture.FromStream(new MemoryStream(CaptureData));
+                Colour = Colour4.White;
             }
+        }
+
+        private void clearTexture()
+        {
+            CaptureData = null;
+            Texture = Texture.WhitePixel;
+            Colour = Colour4.Black;
         }
 
         private void startRecording()
