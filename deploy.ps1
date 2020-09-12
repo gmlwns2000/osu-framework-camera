@@ -16,5 +16,5 @@ catch {
 }
 finally {
     $version = [string]::Format("{0}.{1}.{2}", [string]$year, [string]$monthDay, [string]$revision)
-    & dotnet.exe pack ./osu.Framework.Camera/osu.Framework.Camera.csproj -c Release -o output /p:Version=$version
+    & dotnet pack ./osu.Framework.Camera/osu.Framework.Camera.csproj -c Release -o output /p:Version=$version
 }
