@@ -10,6 +10,10 @@ try {
     if ( ([int]($current[0]) -eq $year) -and ([int]($current[1]) -eq $monthDay) ) {
         $revision = [int]($current[2]) + 1
     }
+
+    if ($monthDay.length -eq 2) {
+       $monthDay = "0" + $monthDay
+    }
 }
 catch {
     Write-Host "An error has occured. The package may not exist yet in NuGet."
