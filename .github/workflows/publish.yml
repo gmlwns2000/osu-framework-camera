@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     name: publish
-    runs-on: windows-2019
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,8 +22,12 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       
-      - name: Build and Publish
+      - name: Build
         run: ./deploy.ps1
-        shell: powershell
-        env:
-          NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
+        shell: pwsh
+
+      - name: Publish
+        run:  |
+           dotnet nuget push ./output/*.nupkg -k ${{secrets.NUGET_API_KEY}} --skip-duplicate --no-symbols true && \
+           dotnet tool install gpr -g && \
+           gpr push ./output/*.nupkg --repository https://github.com/${{github.repository}} -k ${{github.token}}

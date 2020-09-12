@@ -17,5 +17,4 @@ catch {
 finally {
     $version = [string]::Format("{0}.{1}.{2}", [string]$year, [string]$monthDay, [string]$revision)
     & dotnet.exe pack ./osu.Framework.Camera/osu.Framework.Camera.csproj -c Release -o output /p:Version=$version
-    & dotnet.exe nuget push ./output/osu.Framework.Camera.$version.nupkg --api-key $env:NUGET_API_KEY --skip-duplicate --no-symbols true
 }
