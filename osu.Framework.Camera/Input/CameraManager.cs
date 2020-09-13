@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using DirectShowLib;
 using osu.Framework.Bindables;
@@ -15,9 +17,9 @@ namespace osu.Framework.Input
 {
     public class CameraManager : IDisposable
     {
-        private ImmutableList<DsDevice> cameraDevices = ImmutableList<DsDevice>.Empty;
+        private ImmutableList<CameraDevice> cameraDevices = ImmutableList<CameraDevice>.Empty;
         private ImmutableList<string> cameraDeviceNames = ImmutableList<string>.Empty;
-        private readonly DsDeviceUpdateComparer updateComparer = new DsDeviceUpdateComparer();
+        private readonly CameraDeviceUpdateComparer updateComparer = new CameraDeviceUpdateComparer();
         private readonly GameThread thread;
         private Scheduler scheduler => thread.Scheduler;
         private Scheduler eventScheduler => EventScheduler ?? scheduler;
@@ -48,7 +50,59 @@ namespace osu.Framework.Input
             });
         }
 
-        protected virtual IEnumerable<DsDevice> EnumerateAllDevices() => DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+        protected virtual IEnumerable<CameraDevice> EnumerateAllDevices()
+        {
+            // There aren't any good cross-platform friendly examples of camera device enumeration for .NET.
+            // Most of which found are really old examples which is very unfortunate for us.
+
+            var devices = new List<CameraDevice>();
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    var cameras = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+
+                    foreach (var camera in cameras)
+                        devices.Add(new CameraDevice
+                        {
+                            Name = camera.Name,
+                            Path = camera.DevicePath,
+                        });
+
+                    break;
+
+                case RuntimeInfo.Platform.Linux:
+                    var devDir = Directory.EnumerateDirectories(@"/dev/").ToArray();
+                    var regexp = new Regex(@"\/dev\/video\d+");
+
+                    for (int i = 0; i < devDir.Length; i++)
+                    {
+                        string path = $"/dev/video{i}";
+                        string name = null;
+                        
+                        try
+                        {
+                            using (var reader = new StreamReader(File.OpenRead($"/sys/class/video4linux/video{i}/name")))
+                                name = reader.ReadToEnd();
+                        }
+                        catch
+                        {
+                        }
+
+                        devices.Add(new CameraDevice
+                        {
+                            Name = !string.IsNullOrEmpty(name) ? name : path,
+                            Path = path
+                        });
+                        
+                    }
+                    break;
+
+                default:
+                    throw new PlatformNotSupportedException($"{nameof(RuntimeInfo.OS)} is not supported.");
+            }
+
+            return devices;
+        }
 
         private void syncCameraDevices()
         {
@@ -95,11 +149,11 @@ namespace osu.Framework.Input
             GC.SuppressFinalize(this);
         }
 
-        private class DsDeviceUpdateComparer : IEqualityComparer<DsDevice>
+        private class CameraDeviceUpdateComparer : IEqualityComparer<CameraDevice>
         {
-            public bool Equals([AllowNull] DsDevice x, [AllowNull] DsDevice y) => x.DevicePath == y.DevicePath;
+            public bool Equals([AllowNull] CameraDevice x, [AllowNull] CameraDevice y) => x.Path == y.Path;
 
-            public int GetHashCode(DsDevice obj) => obj.Name.GetHashCode();
+            public int GetHashCode(CameraDevice obj) => obj.Name.GetHashCode();
         }
     }
 }
